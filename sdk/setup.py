@@ -46,7 +46,7 @@ with open("./lusid_asyncio/__version__.py") as fp:
 
 setup(
 
-    name='lusid-sdk-preview',
+    name='lusid-sdk-asyncio-preview',
     version=version['__version__'],
     description='Python Asyncio Preview SDK for LUSID API',
     url='https://github.com/finbourne/lusid-sdk-python-asyncio-preview',
