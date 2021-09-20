@@ -8,8 +8,8 @@ import logging
 # import lusid specific packages
 import lusid_asyncio as lusid
 import lusid_asyncio.models as models
-from utilities import InstrumentLoader
-from utilities import TestDataUtilities
+from tests.utilities import InstrumentLoader
+from tests.utilities import TestDataUtilities
 
 
 class TransactionProperty(asynctest.TestCase):

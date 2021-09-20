@@ -7,8 +7,8 @@ import pytz
 
 import lusid_asyncio as lusid
 from lusidfeature import lusid_feature
-from utilities import InstrumentLoader
-from utilities import TestDataUtilities
+from tests.utilities import InstrumentLoader
+from tests.utilities import TestDataUtilities
 
 
 class Bitemporal(asynctest.TestCase):

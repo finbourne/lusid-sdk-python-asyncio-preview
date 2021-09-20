@@ -10,8 +10,8 @@ from lusid_asyncio import PerpetualProperty
 from lusid_asyncio import PropertyValue
 from lusid_asyncio import ResourceId
 from lusidfeature import lusid_feature
-from utilities import InstrumentLoader
-from utilities import TestDataUtilities
+from tests.utilities import InstrumentLoader
+from tests.utilities import TestDataUtilities
 import json
 
 

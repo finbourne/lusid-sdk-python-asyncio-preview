@@ -5,7 +5,7 @@ import lusid_asyncio.api
 from lusid_asyncio import ApiException
 from lusid_asyncio.utilities import ApiClientFactory
 
-from utilities import CredentialsSource
+from tests.utilities import CredentialsSource
 
 
 class MockApi:

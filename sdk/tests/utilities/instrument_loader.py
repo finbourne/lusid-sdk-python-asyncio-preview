@@ -18,7 +18,7 @@ class InstrumentLoader:
     def __init__(self, instruments_api: lusid.InstrumentsApi):
         self.instruments_api = instruments_api
 
-    def load_instruments(self):
+    async def load_instruments(self):
         instruments_to_create = {
             i.Figi: models.InstrumentDefinition(
                 name=i.Name,
@@ -28,7 +28,7 @@ class InstrumentLoader:
             ) for i in self.__instruments
         }
 
-        response = self.instruments_api.upsert_instruments(request_body=instruments_to_create)
+        response = await self.instruments_api.upsert_instruments(request_body=instruments_to_create)
 
         assert (len(response.failed) == 0)
 

@@ -11,9 +11,9 @@ from lusid_asyncio import (InstrumentsApi, ResourceListOfInstrumentIdTypeDescrip
                    TCPKeepAlivePoolManager, TCPKeepAliveProxyManager)
 from lusid_asyncio.utilities import ApiClientFactory
 
-from utilities import TokenUtilities as tu, CredentialsSource
-from utilities.temp_file_manager import TempFileManager
-from utilities import MockApiResponse
+from tests.utilities import TokenUtilities as tu, CredentialsSource
+from tests.utilities.temp_file_manager import TempFileManager
+from tests.utilities import MockApiResponse
 
 
 class UnknownApi:

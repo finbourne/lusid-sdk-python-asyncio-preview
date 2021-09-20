@@ -10,7 +10,7 @@ from datetime import datetime
 # import lusid specific packages
 import lusid_asyncio as lusid
 import lusid_asyncio.models as models
-from utilities import TestDataUtilities
+from tests.utilities import TestDataUtilities
 
 # setup logging configuration
 logging.basicConfig(level=logging.INFO)

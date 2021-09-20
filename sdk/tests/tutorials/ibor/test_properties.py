@@ -10,9 +10,9 @@ import lusid_asyncio.models as models
 from lusidfeature import lusid_feature
 
 from lusid_asyncio.utilities.api_client_builder import ApiClientBuilder
-from utilities.instrument_loader import InstrumentLoader
-from utilities.test_data_utilities import TestDataUtilities
-from utilities.credentials_source import CredentialsSource
+from tests.utilities.instrument_loader import InstrumentLoader
+from tests.utilities.test_data_utilities import TestDataUtilities
+from tests.utilities.credentials_source import CredentialsSource
 
 
 class Properties(asynctest.TestCase):

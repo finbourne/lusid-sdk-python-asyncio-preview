@@ -6,8 +6,8 @@ import asynctest
 import lusid_asyncio as lusid
 import lusid_asyncio.models as models
 from lusidfeature import lusid_feature
-from utilities import InstrumentLoader
-from utilities import TestDataUtilities
+from tests.utilities import InstrumentLoader
+from tests.utilities import TestDataUtilities
 
 
 class CutLabels(asynctest.TestCase):

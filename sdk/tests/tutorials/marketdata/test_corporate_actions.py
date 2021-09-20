@@ -9,8 +9,8 @@ import lusid_asyncio as lusid
 import lusid_asyncio.models as models
 from lusidfeature import lusid_feature
 from lusid_asyncio.utilities.api_client_builder import ApiClientBuilder
-from utilities.credentials_source import CredentialsSource
-from utilities.test_data_utilities import TestDataUtilities
+from tests.utilities.credentials_source import CredentialsSource
+from tests.utilities.test_data_utilities import TestDataUtilities
 
 
 class CorporateActions(asynctest.TestCase):

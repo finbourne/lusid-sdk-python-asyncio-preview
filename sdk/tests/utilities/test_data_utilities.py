@@ -7,7 +7,7 @@ import lusid_asyncio as lusid
 import lusid_asyncio.models as models
 from lusid_asyncio.utilities import ApiClientBuilder
 
-from utilities import CredentialsSource
+from tests.utilities import CredentialsSource
 
 import unittest
 
@@ -35,7 +35,7 @@ class TestDataUtilities:
                     cls._api_client = ApiClientBuilder().build(CredentialsSource.secrets_path())
         return cls._api_client
 
-    def create_transaction_portfolio(self, scope):
+    async def create_transaction_portfolio(self, scope):
         guid = str(uuid.uuid4())
 
         # Effective date of the portfolio, this is the date the portfolio was created and became live.
@@ -49,7 +49,7 @@ class TestDataUtilities:
                                                            created=effective_date)
 
         # Create the portfolio in LUSID
-        portfolio = self.transaction_portfolio_api.create_portfolio(scope, create_transaction_portfolio_request=request)
+        portfolio = await self.transaction_portfolio_api.create_portfolio(scope, create_transaction_portfolio_request=request)
 
         assert (portfolio.id.code == request.code)
 

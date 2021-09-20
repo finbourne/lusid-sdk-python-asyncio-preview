@@ -5,7 +5,7 @@ import pytz
 import lusid_asyncio as lusid
 import lusid_asyncio.models as models
 from datetime import datetime
-from utilities import TestDataUtilities
+from tests.utilities import TestDataUtilities
 
 
 class ComplexInstrumentTests(asynctest.TestCase):
