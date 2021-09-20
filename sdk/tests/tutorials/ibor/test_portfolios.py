@@ -14,21 +14,20 @@ from tests.utilities import TestDataUtilities
 
 class Portfolios(asynctest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.scopes_api = lusid.ScopesApi(api_client)
-        cls.portfolios_api = lusid.PortfoliosApi(api_client)
-        cls.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
-        cls.property_definitions_api = lusid.PropertyDefinitionsApi(api_client)
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
+        self.scopes_api = lusid.ScopesApi(api_client)
+        self.portfolios_api = lusid.PortfoliosApi(api_client)
+        self.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
+        self.property_definitions_api = lusid.PropertyDefinitionsApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
 
-        instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
+        instrument_loader = InstrumentLoader(self.instruments_api)
+        self.instrument_ids = await instrument_loader.load_instruments()
 
-        cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
+        self.test_data_utilities = TestDataUtilities(self.transaction_portfolios_api)
     @lusid_feature("F8")
     async def test_create_portfolio(self):
         guid = str(uuid.uuid4())
@@ -44,7 +43,7 @@ class Portfolios(asynctest.TestCase):
             base_currency="GBP")
 
         # create the portfolio in LUSID in the specified scope
-        result = self.transaction_portfolios_api.create_portfolio(
+        result = await self.transaction_portfolios_api.create_portfolio(
             scope=TestDataUtilities.tutorials_scope,
             create_transaction_portfolio_request=request)
 
@@ -68,7 +67,7 @@ class Portfolios(asynctest.TestCase):
         )
 
         #   create the property definition
-        property_definition_result = self.property_definitions_api.create_property_definition(
+        property_definition_result = await self.property_definitions_api.create_property_definition(
             create_property_definition_request=property_definition)
 
         #  property value
@@ -87,14 +86,14 @@ class Portfolios(asynctest.TestCase):
                                                            })
 
         # create the portfolio
-        portfolio = self.transaction_portfolios_api.create_portfolio(
+        portfolio = await self.transaction_portfolios_api.create_portfolio(
             scope=TestDataUtilities.tutorials_scope,
             create_transaction_portfolio_request=request)
 
         portfolio_code = portfolio.id.code
         self.assertEqual(portfolio_code, request.code)
 
-        portfolio_properties = self.portfolios_api.get_portfolio_properties(TestDataUtilities.tutorials_scope,
+        portfolio_properties = await self.portfolios_api.get_portfolio_properties(TestDataUtilities.tutorials_scope,
                                                                             portfolio_code)
 
         self.assertEqual(len(portfolio_properties.properties), 1)
@@ -107,7 +106,7 @@ class Portfolios(asynctest.TestCase):
         effective_date = datetime(2018, 1, 1, tzinfo=pytz.utc)
 
         # create the portfolio
-        portfolio_id = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_id = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         #   details of the transaction to be added
         transaction = models.TransactionRequest(
@@ -127,13 +126,13 @@ class Portfolios(asynctest.TestCase):
         )
 
         #   add the transaction
-        self.transaction_portfolios_api.upsert_transactions(
+        await self.transaction_portfolios_api.upsert_transactions(
             TestDataUtilities.tutorials_scope,
             portfolio_id,
             transaction_request=[transaction])
 
         #   get the trades
-        trades = self.transaction_portfolios_api.get_transactions(TestDataUtilities.tutorials_scope, portfolio_id)
+        trades = await self.transaction_portfolios_api.get_transactions(TestDataUtilities.tutorials_scope, portfolio_id)
 
         self.assertEqual(len(trades.values), 1)
         self.assertEqual(trades.values[0].transaction_id, transaction.transaction_id)
@@ -163,14 +162,14 @@ class Portfolios(asynctest.TestCase):
         )
 
         #   create the property definition
-        property_definition_result = self.property_definitions_api.create_property_definition(
+        property_definition_result = await self.property_definitions_api.create_property_definition(
             create_property_definition_request=property_definition)
 
         # effective date for which portfolio is created
         effective_date = datetime(2018, 1, 1, tzinfo=pytz.utc)
 
         # create the portfolio
-        portfolio_id = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_id = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         property_value_as_string = "A Trader"
         property_value = models.PropertyValue(property_value_as_string)
@@ -192,13 +191,13 @@ class Portfolios(asynctest.TestCase):
         )
 
         #   add the transaction
-        self.transaction_portfolios_api.upsert_transactions(
+        await self.transaction_portfolios_api.upsert_transactions(
             TestDataUtilities.tutorials_scope,
             portfolio_id,
             transaction_request=[transaction])
 
         #   get the trades
-        trades = self.transaction_portfolios_api.get_transactions(TestDataUtilities.tutorials_scope, portfolio_id)
+        trades = await self.transaction_portfolios_api.get_transactions(TestDataUtilities.tutorials_scope, portfolio_id)
 
         self.assertEqual(len(trades.values), 1)
         self.assertEqual(trades.values[0].transaction_id, transaction.transaction_id)
@@ -207,7 +206,7 @@ class Portfolios(asynctest.TestCase):
     @lusid_feature("F12")
     async def test_list_scopes(self):
         # Get the list of scopes across all entities
-        scopes = self.scopes_api.list_scopes()
+        scopes = await self.scopes_api.list_scopes()
 
         self.assertGreater(len(scopes.values), 0)
 
@@ -217,9 +216,9 @@ class Portfolios(asynctest.TestCase):
         scope = TestDataUtilities.tutorials_scope + str(uuid.uuid4())
 
         for i in range(10):
-            self.test_data_utilities.create_transaction_portfolio(scope)
+            await self.test_data_utilities.create_transaction_portfolio(scope)
 
         # Retrieve the list of portfolios
-        portfolios = self.portfolios_api.list_portfolios_for_scope(scope)
+        portfolios = await self.portfolios_api.list_portfolios_for_scope(scope)
 
         self.assertEqual(len(portfolios.values), 10)

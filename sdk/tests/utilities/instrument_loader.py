@@ -34,6 +34,6 @@ class InstrumentLoader:
 
         return sorted([i.lusid_instrument_id for i in response.values.values()])
 
-    def delete_instruments(self):
+    async def delete_instruments(self):
         for i in self.__instruments:
-            self.instruments_api.delete_instrument("Figi", i.Figi)
+            await self.instruments_api.delete_instrument("Figi", i.Figi)

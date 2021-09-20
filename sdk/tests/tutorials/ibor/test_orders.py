@@ -20,11 +20,11 @@ class Orders(asynctest.TestCase):
     test_codes = ['TIF', 'OrderBook', 'PortfolioManager', 'Account', 'Strategy']
 
     @staticmethod
-    def load_properties(api_client, scopes, codes):
+    async def load_properties(api_client, scopes, codes):
         for scope in scopes:
             for code in codes:
                 try:
-                    lusid.PropertyDefinitionsApi(api_client).create_property_definition(
+                    await lusid.PropertyDefinitionsApi(api_client).create_property_definition(
                         create_property_definition_request=models.CreatePropertyDefinitionRequest(
                             domain="Order",
                             scope=scope,
@@ -38,16 +38,14 @@ class Orders(asynctest.TestCase):
                     if json.loads(e.body)["name"] == "PropertyAlreadyExists":
                         pass # ignore if the property definition exists
 
-
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(cls):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
         cls.orders_api = lusid.OrdersApi(api_client)
         cls.instruments_api = lusid.InstrumentsApi(api_client)
         instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
-        cls.load_properties(api_client=api_client, scopes=cls.tests_scope.values(), codes=cls.test_codes)
+        cls.instrument_ids = await instrument_loader.load_instruments()
+        await cls.load_properties(api_client=api_client, scopes=cls.tests_scope.values(), codes=cls.test_codes)
 
     @lusid_feature("F4")
     async def test_upsert_simple_order(self):
@@ -81,7 +79,7 @@ class Orders(asynctest.TestCase):
 
         order_set_request = OrderSetRequest(order_requests=[order_request])
 
-        upsert_result = self.orders_api.upsert_orders(order_set_request=order_set_request)
+        upsert_result = await self.orders_api.upsert_orders(order_set_request=order_set_request)
 
         self.assertEqual(len(upsert_result.values),1)
         response=upsert_result.values[0].to_dict()

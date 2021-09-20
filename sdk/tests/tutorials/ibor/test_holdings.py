@@ -13,8 +13,7 @@ from tests.utilities import TestDataUtilities
 
 class Holdings(asynctest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(cls):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
@@ -26,7 +25,7 @@ class Holdings(asynctest.TestCase):
         cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
 
         cls.instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = cls.instrument_loader.load_instruments()
+        cls.instrument_ids = await cls.instrument_loader.load_instruments()
 
     @lusid_feature("F2")
     async def test_get_holdings(self):
@@ -39,7 +38,7 @@ class Holdings(asynctest.TestCase):
         day_tplus10 = datetime(2018, 1, 10, tzinfo=pytz.utc)
 
         # Create a portfolio
-        portfolio_id = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_id = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         transactions = [
             # Starting cash position
@@ -61,11 +60,11 @@ class Holdings(asynctest.TestCase):
         ]
 
         # Upload the transactions to LUSID
-        self.transaction_portfolios_api.upsert_transactions(TestDataUtilities.tutorials_scope, code=portfolio_id,
+        await self.transaction_portfolios_api.upsert_transactions(TestDataUtilities.tutorials_scope, code=portfolio_id,
                                                             transaction_request=transactions)
 
         # Get the portfolio holdings on T+10
-        holdings = self.transaction_portfolios_api.get_holdings(TestDataUtilities.tutorials_scope, portfolio_id,
+        holdings = await self.transaction_portfolios_api.get_holdings(TestDataUtilities.tutorials_scope, portfolio_id,
                                                                 effective_at=day_tplus10)
 
         # Ensure we have 5 holdings: 1 cash position and a position in 4 instruments that aggregates the 5 transactions
@@ -107,7 +106,7 @@ class Holdings(asynctest.TestCase):
         day1 = datetime(2018, 1, 1, tzinfo=pytz.utc)
         day2 = datetime(2018, 1, 5, tzinfo=pytz.utc)
 
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         instrument1 = self.instrument_ids[0]
         instrument2 = self.instrument_ids[1]
@@ -154,7 +153,7 @@ class Holdings(asynctest.TestCase):
         ]
 
         # set the initial holdings on day 1
-        self.transaction_portfolios_api.set_holdings(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.set_holdings(scope=TestDataUtilities.tutorials_scope,
                                                      code=portfolio_code,
                                                      adjust_holding_request=holdings_adjustments,
                                                      effective_at=day1)
@@ -175,12 +174,12 @@ class Holdings(asynctest.TestCase):
                                                                transaction_type="Buy")
         ]
 
-        self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_request=transactions)
 
         # get the holdings for day 2
-        holdings = self.transaction_portfolios_api.get_holdings(scope=TestDataUtilities.tutorials_scope,
+        holdings = await self.transaction_portfolios_api.get_holdings(scope=TestDataUtilities.tutorials_scope,
                                                                 code=portfolio_code,
                                                                 effective_at=day2)
 

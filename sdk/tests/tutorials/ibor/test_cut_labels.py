@@ -12,8 +12,7 @@ from tests.utilities import TestDataUtilities
 
 class CutLabels(asynctest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(cls):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
@@ -21,7 +20,7 @@ class CutLabels(asynctest.TestCase):
         cls.instruments_api = lusid.InstrumentsApi(api_client)
 
         instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
+        cls.instrument_ids = await instrument_loader.load_instruments()
 
         cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
 
@@ -39,7 +38,7 @@ class CutLabels(asynctest.TestCase):
         # Create cut labels
         code = {}
 
-        def create_cut_label(hours, minutes, display_name, description, time_zone, code_dict):
+        async def create_cut_label(hours, minutes, display_name, description, time_zone, code_dict):
             # Create the time for the cut label
             time = models.CutLocalTime(hours=hours, minutes=minutes)
 
@@ -55,7 +54,7 @@ class CutLabels(asynctest.TestCase):
             code_dict[request.display_name] = request.code
 
             # Send the request to LUSID to create the cut label
-            result = self.cut_labels.create_cut_label_definition(
+            result = await self.cut_labels.create_cut_label_definition(
                 create_cut_label_definition_request=request)
 
             # Check that result gives same details as input
@@ -65,22 +64,22 @@ class CutLabels(asynctest.TestCase):
             self.assertEqual(result.time_zone, time_zone)
 
         # Create cut labels for different time zones
-        create_cut_label(hours=9, minutes=0, display_name="LondonOpen", description="London Opening Time, 9am in UK",
+        await create_cut_label(hours=9, minutes=0, display_name="LondonOpen", description="London Opening Time, 9am in UK",
                          time_zone="GB", code_dict=code)
-        create_cut_label(hours=17, minutes=0, display_name="LondonClose", description="London Closing Time, 5pm in UK",
+        await create_cut_label(hours=17, minutes=0, display_name="LondonClose", description="London Closing Time, 5pm in UK",
                          time_zone="GB", code_dict=code)
-        create_cut_label(hours=9, minutes=0, display_name="SingaporeOpen", description="", time_zone="Singapore",
+        await create_cut_label(hours=9, minutes=0, display_name="SingaporeOpen", description="", time_zone="Singapore",
                          code_dict=code)
-        create_cut_label(hours=17, minutes=0, display_name="SingaporeClose", description="", time_zone="Singapore",
+        await create_cut_label(hours=17, minutes=0, display_name="SingaporeClose", description="", time_zone="Singapore",
                          code_dict=code)
-        create_cut_label(hours=9, minutes=0, display_name="NYOpen", description="", time_zone="America/New_York",
+        await create_cut_label(hours=9, minutes=0, display_name="NYOpen", description="", time_zone="America/New_York",
                          code_dict=code)
-        create_cut_label(hours=17, minutes=0, display_name="NYClose", description="", time_zone="America/New_York",
+        await create_cut_label(hours=17, minutes=0, display_name="NYClose", description="", time_zone="America/New_York",
                          code_dict=code)
 
         ## Create portfolio
         scope = 'cut_labels_demo'
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(scope)
 
         ## Get the instrument identifiers
         instrument1 = self.instrument_ids[0]
@@ -120,7 +119,7 @@ class CutLabels(asynctest.TestCase):
                                                                    )
         ]
         # add initial holdings to our portfolio from LondonOpen 5 days ago
-        self.transaction_portfolios_api.set_holdings(scope=scope,
+        await self.transaction_portfolios_api.set_holdings(scope=scope,
                                                      code=portfolio_code,
                                                      adjust_holding_request=initial_holdings,
                                                      effective_at=initial_holdings_cut_label)
@@ -128,7 +127,7 @@ class CutLabels(asynctest.TestCase):
         ## Check initial holdings
         # get holdings at LondonOpen today, before transactions occur
         get_holdings_cut_label = cut_label_formatter(date.today(), code["LondonOpen"])
-        holdings = self.transaction_portfolios_api.get_holdings(scope=scope,
+        holdings = await self.transaction_portfolios_api.get_holdings(scope=scope,
                                                                 code=portfolio_code,
                                                                 effective_at=get_holdings_cut_label)
         # check that holdings are as expected before transactions occur for each instrument
@@ -186,14 +185,14 @@ class CutLabels(asynctest.TestCase):
                                                                transaction_type="Buy")
         ]
         # Add transactions to the portfolio
-        self.transaction_portfolios_api.upsert_transactions(scope=scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=scope,
                                                             code=portfolio_code,
                                                             transaction_request=transactions)
 
         ## Retrieve holdings at LondonClose today (5pm local time)
         # This will mean that the 4th transaction will not be included, demonstrating how cut labels work across time zones
         get_holdings_cut_label = cut_label_formatter(date.today(), code["LondonClose"])
-        holdings = self.transaction_portfolios_api.get_holdings(scope=scope,
+        holdings = await self.transaction_portfolios_api.get_holdings(scope=scope,
                                                                 code=portfolio_code,
                                                                 effective_at=get_holdings_cut_label)
 

@@ -3,6 +3,7 @@ from collections import UserString
 from datetime import datetime
 from unittest.mock import patch
 
+import aiohttp
 import asynctest
 from urllib3 import PoolManager, ProxyManager
 from parameterized import parameterized
@@ -135,7 +136,7 @@ class ApiFactory(asynctest.TestCase):
         self.assertIsInstance(api, InstrumentsApi)
 
         with self.assertRaises(ValueError) as error:
-            api.get_instrument_identifier_types(call_info="invalid param")
+            await api.get_instrument_identifier_types(call_info="invalid param")
 
         self.assertEqual(error.exception.args[0], "call_info value must be a lambda")
 
@@ -240,14 +241,13 @@ class ApiFactory(asynctest.TestCase):
         )
         # Make sure tcp_keep_alive was passed through all of the layers
         self.assertTrue(api_factory.api_client.configuration.tcp_keep_alive)
-        self.assertIsInstance(api_factory.api_client.rest_client.pool_manager,
-                              (TCPKeepAlivePoolManager, TCPKeepAliveProxyManager))
+        self.assertIsInstance(api_factory.api_client.rest_client.pool_manager, aiohttp.client.ClientSession)
 
     async def test_get_api_without_tcp_keep_alive(self):
         api_factory = ApiClientFactory(api_secrets_filename=CredentialsSource.secrets_path())
         # Make sure tcp_keep_alive was passed through all of the layers
         self.assertFalse(api_factory.api_client.configuration.tcp_keep_alive)
-        self.assertIsInstance(api_factory.api_client.rest_client.pool_manager, (PoolManager, ProxyManager))
+        self.assertIsInstance(api_factory.api_client.rest_client.pool_manager, aiohttp.client.ClientSession)
 
     async def test_use_apifactory_with_id_provider_response_handler(self):
         """
@@ -280,8 +280,8 @@ class ApiFactory(asynctest.TestCase):
             api_secrets_filename=CredentialsSource.secrets_path()
         )
 
-        def get_identifier_types(factory):
-            return factory.build(InstrumentsApi).get_instrument_identifier_types()
+        async def get_identifier_types(factory):
+            return await factory.build(InstrumentsApi).get_instrument_identifier_types()
 
         thread1 = Thread(target=get_identifier_types, args=[api_factory])
         thread2 = Thread(target=get_identifier_types, args=[api_factory])

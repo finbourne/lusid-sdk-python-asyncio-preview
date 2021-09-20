@@ -80,7 +80,7 @@ class ApiClientFactory:
 
             @functools.wraps(attr)
             @lusidretry
-            def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs):
                 def is_http_info_method(m):
                     return inspect.ismethod(m) and m.__name__.endswith(
                         "_with_http_info"
@@ -93,11 +93,11 @@ class ApiClientFactory:
                         raise ValueError("call_info value must be a lambda")
 
                     if is_http_info_method(attr):
-                        result = attr(*args, **kwargs)
+                        result = await attr(*args, **kwargs)
                     else:
                         #   switch to the '_with_http_info' implementation
                         func = getattr(source_obj, f"{name}_with_http_info")
-                        result = func(*args, **kwargs)
+                        result = await func(*args, **kwargs)
 
                     # pass the http info to caller
                     callback(result[2])
