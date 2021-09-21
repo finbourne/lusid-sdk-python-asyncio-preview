@@ -16,6 +16,8 @@ import json
 
 
 class Orders(asynctest.TestCase):
+    use_default_loop = True
+
     tests_scope = {'simple-upsert': 'Orders-SimpleUpsert-TestScope'}
     test_codes = ['TIF', 'OrderBook', 'PortfolioManager', 'Account', 'Strategy']
 

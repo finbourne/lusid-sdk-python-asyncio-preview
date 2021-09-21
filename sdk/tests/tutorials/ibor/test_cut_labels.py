@@ -11,6 +11,7 @@ from tests.utilities import TestDataUtilities
 
 
 class CutLabels(asynctest.TestCase):
+    use_default_loop = True
 
     async def setUp(cls):
         # create a configured API client

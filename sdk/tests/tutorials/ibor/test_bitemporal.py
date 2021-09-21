@@ -12,6 +12,7 @@ from tests.utilities import TestDataUtilities
 
 
 class Bitemporal(asynctest.TestCase):
+    use_default_loop = True
 
     async def setUp(cls):
         # create a configured API client

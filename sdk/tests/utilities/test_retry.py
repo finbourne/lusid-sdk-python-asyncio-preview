@@ -63,11 +63,10 @@ class MockApi:
 class RetryTests(asynctest.TestCase):
     factory = None
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # add mock to the module
         lusid_asyncio.api.MockApi = MockApi
-        cls.factory = ApiClientFactory(api_secrets_filename=CredentialsSource.secrets_path())
+        self.factory = ApiClientFactory(api_secrets_filename=CredentialsSource.secrets_path())
 
     async def test_non_retryable_is_not_retried(self):
         api = self.factory.build(MockApi)
@@ -142,7 +141,7 @@ class RetryTests(asynctest.TestCase):
 
     async def test_providing_retry_invokes_call(self):
         with self.assertRaises(ApiException) as ex:
-            self.factory.build(lusid.InstrumentsApi).get_instrument(
+            self.factory.build(lusid_asyncio.InstrumentsApi).get_instrument(
                 identifier_type="doesnt_exist",
                 identifier="blah",
                 lusid_retries=1
