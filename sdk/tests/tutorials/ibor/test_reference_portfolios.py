@@ -108,7 +108,7 @@ class ReferencePortfolio(asynctest.TestCase):
         )
 
         # Make the upsert request via the reference portfolio API
-        self.reference_portfolio_api.upsert_reference_portfolio_constituents(
+        await self.reference_portfolio_api.upsert_reference_portfolio_constituents(
             scope=TestDataUtilities.tutorials_scope,
             code=f40_reference_portfolio_code,
             upsert_reference_portfolio_constituents_request=bulk_constituent_request,
