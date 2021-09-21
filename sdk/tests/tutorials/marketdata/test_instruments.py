@@ -10,20 +10,20 @@ from tests.utilities import TestDataUtilities
 
 class Instruments(asynctest.TestCase):
     property_definitions_api = None
+    use_default_loop = True
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
-        cls.property_definitions_api = lusid.PropertyDefinitionsApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
+        self.property_definitions_api = lusid.PropertyDefinitionsApi(api_client)
 
     @classmethod
-    def ensure_property_definition(cls, code):
+    async def ensure_property_definition(cls, code):
 
         try:
-            cls.property_definitions_api.get_property_definition(
+            await cls.property_definitions_api.get_property_definition(
                 domain="Instrument",
                 scope=TestDataUtilities.tutorials_scope,
                 code=code
@@ -40,11 +40,11 @@ class Instruments(asynctest.TestCase):
             )
 
             # create the property
-            cls.property_definitions_api.create_property_definition(definition=property_definition)
+            await cls.property_definitions_api.create_property_definition(definition=property_definition)
 
     @lusid_feature("F41")
     async def test_seed_instrument_master(self):
-        response = self.instruments_api.upsert_instruments(request_body={
+        response = await self.instruments_api.upsert_instruments(request_body={
 
             "BBG000FD8G46": models.InstrumentDefinition(
                 name="HISCOX LTD",
@@ -95,7 +95,7 @@ class Instruments(asynctest.TestCase):
         figi = "BBG000FD8G46"
 
         # set up the instrument
-        response = self.instruments_api.upsert_instruments(request_body={
+        response = await self.instruments_api.upsert_instruments(request_body={
             figi: models.InstrumentDefinition(
                 name="HISCOX LTD",
                 identifiers={
@@ -108,7 +108,7 @@ class Instruments(asynctest.TestCase):
 
         # look up an instrument that already exists in the instrument master by a
         # unique id, in this case an OpenFigi, and also return a list of aliases
-        looked_up_instruments = self.instruments_api.get_instruments(identifier_type="Figi",
+        looked_up_instruments = await self.instruments_api.get_instruments(identifier_type="Figi",
                                                                      request_body=[figi],
                                                                      property_keys=[
                                                                          "Instrument/default/ClientInternal"
@@ -125,7 +125,7 @@ class Instruments(asynctest.TestCase):
     @lusid_feature("F23")
     async def test_list_available_identifiers(self):
 
-        identifiers = self.instruments_api.get_instrument_identifier_types()
+        identifiers = await self.instruments_api.get_instrument_identifier_types()
         self.assertGreater(len(identifiers.values), 0)
 
     @lusid_feature("F24")
@@ -134,7 +134,7 @@ class Instruments(asynctest.TestCase):
         page_size = 5
 
         # list the instruments, restricting the number that are returned
-        instruments = self.instruments_api.list_instruments(limit=page_size)
+        instruments = await self.instruments_api.list_instruments(limit=page_size)
 
         self.assertLessEqual(len(instruments.values), page_size)
 
@@ -144,7 +144,7 @@ class Instruments(asynctest.TestCase):
         figis = ["BBG000FD8G46", "BBG000DW76R4", "BBG000PQKVN8"]
 
         # get a set of instruments querying by FIGIs
-        instruments = self.instruments_api.get_instruments(identifier_type="Figi", request_body=figis)
+        instruments = await self.instruments_api.get_instruments(identifier_type="Figi", request_body=figis)
 
         for figi in figis:
             self.assertTrue(figi in instruments.values, msg=f"{figi} not returned")
@@ -158,7 +158,7 @@ class Instruments(asynctest.TestCase):
         identifier = "BBG000FD8G46"
 
         # update the instrument
-        self.instruments_api.upsert_instruments_properties(upsert_instrument_property_request=[
+        await self.instruments_api.upsert_instruments_properties(upsert_instrument_property_request=[
             models.UpsertInstrumentPropertyRequest(
                 identifier_type=identifier_type,
                 identifier=identifier,
@@ -167,7 +167,7 @@ class Instruments(asynctest.TestCase):
         ])
 
         # get the instrument with value
-        instrument = self.instruments_api.get_instrument(
+        instrument = await self.instruments_api.get_instrument(
             identifier_type=identifier_type,
             identifier=identifier,
             property_keys=[property_key]

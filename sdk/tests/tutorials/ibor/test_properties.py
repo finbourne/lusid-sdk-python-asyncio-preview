@@ -16,6 +16,7 @@ from tests.utilities.credentials_source import CredentialsSource
 
 
 class Properties(asynctest.TestCase):
+    use_default_loop = True
 
     @classmethod
     def setUpClass(cls):
@@ -54,7 +55,7 @@ class Properties(asynctest.TestCase):
         )
 
         # create property definition
-        label_property_definition_request = self.property_definitions_api.create_property_definition(
+        label_property_definition_request = await self.property_definitions_api.create_property_definition(
             label_property_definition)
 
         # create property values
@@ -75,12 +76,12 @@ class Properties(asynctest.TestCase):
         )
 
         # create portfolio
-        portfolio_request = self.transaction_portfolios_api.create_portfolio(scope=TestDataUtilities.tutorials_scope,
+        portfolio_request = await self.transaction_portfolios_api.create_portfolio(scope=TestDataUtilities.tutorials_scope,
                                                                              create_transaction_portfolio_request=create_portfolio_request)
 
         # get properties for assertions
-        portfolio_properties = self.portfolios_api.get_portfolio_properties(scope=TestDataUtilities.tutorials_scope,
-                                                                            code=portfolio_request.id.code).properties
+        portfolio_properties = (await self.portfolios_api.get_portfolio_properties(scope=TestDataUtilities.tutorials_scope,
+                                                                            code=portfolio_request.id.code)).properties
 
         label_property = portfolio_properties[label_property_definition_request.key]
 
@@ -106,7 +107,7 @@ class Properties(asynctest.TestCase):
         )
 
         # create property definitions
-        metric_property_definition_result = self.property_definitions_api.create_property_definition(metric_property_definition)
+        metric_property_definition_result = await self.property_definitions_api.create_property_definition(metric_property_definition)
 
         # create the property values
         metric_property_value_request = models.PropertyValue(metric_value=models.MetricValue(value=1100000, unit="GBP"))
@@ -127,10 +128,10 @@ class Properties(asynctest.TestCase):
         )
 
         # Create portfolio
-        portfolio_result = self.transaction_portfolios_api.create_portfolio(scope=TestDataUtilities.tutorials_scope,
+        portfolio_result = await self.transaction_portfolios_api.create_portfolio(scope=TestDataUtilities.tutorials_scope,
                                                                             create_transaction_portfolio_request=create_portfolio_request)
-        portfolio_properties = self.portfolios_api.get_portfolio_properties(scope=TestDataUtilities.tutorials_scope,
-                                                                            code=portfolio_result.id.code).properties
+        portfolio_properties = (await self.portfolios_api.get_portfolio_properties(scope=TestDataUtilities.tutorials_scope,
+                                                                            code=portfolio_result.id.code)).properties
         metric_property = portfolio_properties[metric_property_definition_result.key]
 
         # Perform assertions on codes, keys, values and units

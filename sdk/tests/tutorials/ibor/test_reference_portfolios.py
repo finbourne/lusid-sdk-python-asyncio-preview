@@ -16,8 +16,9 @@ from tests.utilities import InstrumentLoader
 
 
 class ReferencePortfolio(asynctest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    use_default_loop = True
+
+    async def setUp(cls):
 
         # Log any exceptions
         cls.logger = logging.getLogger()
@@ -33,7 +34,7 @@ class ReferencePortfolio(asynctest.TestCase):
 
         # Load instruments
         cls.instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = cls.instrument_loader.load_instruments()
+        cls.instrument_ids = await cls.instrument_loader.load_instruments()
 
     @lusid_feature("F39")
     async def test_create_reference_portfolio(self):
@@ -48,7 +49,7 @@ class ReferencePortfolio(asynctest.TestCase):
         )
 
         # Create the reference portfolio in LUSID in the tutorials scope
-        result = self.reference_portfolio_api.create_reference_portfolio(
+        result = await self.reference_portfolio_api.create_reference_portfolio(
             scope=TestDataUtilities.tutorials_scope,
             create_reference_portfolio_request=request,
         )
@@ -56,7 +57,7 @@ class ReferencePortfolio(asynctest.TestCase):
         self.assertEqual(result.id.code, request.code)
 
         # Delete portfolio once the test is complete
-        self.portfolios_api.delete_portfolio(
+        await self.portfolios_api.delete_portfolio(
             scope=TestDataUtilities.tutorials_scope, code=f39_reference_portfolio_code
         )
 
@@ -77,7 +78,7 @@ class ReferencePortfolio(asynctest.TestCase):
             created=effective_date,
         )
 
-        self.reference_portfolio_api.create_reference_portfolio(
+        await self.reference_portfolio_api.create_reference_portfolio(
             scope=TestDataUtilities.tutorials_scope,
             create_reference_portfolio_request=request,
         )
@@ -115,7 +116,7 @@ class ReferencePortfolio(asynctest.TestCase):
 
         # Get reference portfolio holdings
         constituent_holdings = (
-            self.reference_portfolio_api.get_reference_portfolio_constituents(
+            await self.reference_portfolio_api.get_reference_portfolio_constituents(
                 scope=TestDataUtilities.tutorials_scope,
                 code=f40_reference_portfolio_code,
             )
@@ -137,6 +138,6 @@ class ReferencePortfolio(asynctest.TestCase):
             self.assertEqual(constituent.weight, weight)
 
         # Delete portfolio once the test is complete
-        self.portfolios_api.delete_portfolio(
+        await self.portfolios_api.delete_portfolio(
             scope=TestDataUtilities.tutorials_scope, code=f40_reference_portfolio_code
         )

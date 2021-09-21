@@ -13,27 +13,26 @@ from tests.utilities import TestDataUtilities
 
 class Valuation(asynctest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
-        cls.recipes_api = lusid.ConfigurationRecipeApi(api_client)
-        cls.aggregation_api = lusid.AggregationApi(api_client)
-        cls.quotes_api = lusid.QuotesApi(api_client)
-        instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
+        self.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
+        self.recipes_api = lusid.ConfigurationRecipeApi(api_client)
+        self.aggregation_api = lusid.AggregationApi(api_client)
+        self.quotes_api = lusid.QuotesApi(api_client)
+        instrument_loader = InstrumentLoader(self.instruments_api)
+        self.instrument_ids = await instrument_loader.load_instruments()
 
-        cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
+        self.test_data_utilities = TestDataUtilities(self.transaction_portfolios_api)
 
     @lusid_feature("F20")
     async def test_portfolio_aggregation(self):
 
         effective_date = datetime(2019, 4, 15, tzinfo=pytz.utc)
 
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         transactions = [
             self.test_data_utilities.build_transaction_request(instrument_id=self.instrument_ids[0],
@@ -56,7 +55,7 @@ class Valuation(asynctest.TestCase):
                                                                transaction_type="StockIn")
         ]
 
-        self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_request=transactions)
 
@@ -86,7 +85,7 @@ class Valuation(asynctest.TestCase):
             for price in prices
         ]
 
-        self.quotes_api.upsert_quotes(TestDataUtilities.tutorials_scope,
+        await self.quotes_api.upsert_quotes(TestDataUtilities.tutorials_scope,
                                       request_body={"quote" + str(request_number): requests[request_number]
                                               for request_number in range(len(requests))})
 
@@ -107,7 +106,7 @@ class Valuation(asynctest.TestCase):
             )
         )
         upsert_recipe_request = models.UpsertRecipeRequest(demo_recipe)
-        self.recipes_api.upsert_configuration_recipe(upsert_recipe_request)
+        await self.recipes_api.upsert_configuration_recipe(upsert_recipe_request)
 
         valuation_request = models.ValuationRequest(
             recipe_id=models.ResourceId(scope=recipe_scope,code=recipe_code),
@@ -124,7 +123,7 @@ class Valuation(asynctest.TestCase):
         )
 
         #   do the aggregation
-        aggregation = self.aggregation_api.get_valuation(valuation_request=valuation_request)
+        aggregation = await self.aggregation_api.get_valuation(valuation_request=valuation_request)
 
         for item in aggregation.data:
             print("\t{}\t{}\t{}".format(item["Instrument/default/Name"], item["Proportion(Holding/default/PV)"],

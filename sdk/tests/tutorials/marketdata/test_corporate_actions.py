@@ -14,15 +14,16 @@ from tests.utilities.test_data_utilities import TestDataUtilities
 
 
 class CorporateActions(asynctest.TestCase):
-    @classmethod
-    def setUp(cls):
+    use_default_loop = True
+
+    def setUp(self):
         # create a configured API client
         api_client = ApiClientBuilder().build(str(CredentialsSource.secrets_path()))
 
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
-        cls.portfolios_api = lusid.PortfoliosApi(api_client)
-        cls.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
-        cls.corporate_actions_sources_api = lusid.CorporateActionSourcesApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
+        self.portfolios_api = lusid.PortfoliosApi(api_client)
+        self.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
+        self.corporate_actions_sources_api = lusid.CorporateActionSourcesApi(api_client)
 
     def get_guid(self):
         # creates random alphanumeric code
@@ -47,7 +48,7 @@ class CorporateActions(asynctest.TestCase):
 
         # Create two instruments: an "original" instrument which
         # will be renamed and the instrument it will be renamed to.
-        self.instruments_api.upsert_instruments(
+        await self.instruments_api.upsert_instruments(
             request_body={
                 instrument_original_figi: models.InstrumentDefinition(
                     name=instrument_name,
@@ -65,7 +66,7 @@ class CorporateActions(asynctest.TestCase):
         )
 
         # Create a transaction portfolio to hold the original instrument.
-        self.transaction_portfolios_api.create_portfolio(
+        await self.transaction_portfolios_api.create_portfolio(
             scope=TestDataUtilities.tutorials_scope,
             create_transaction_portfolio_request=models.CreateTransactionPortfolioRequest(
                 code=portfolio_code,
@@ -76,7 +77,7 @@ class CorporateActions(asynctest.TestCase):
         )
 
         # Add a transaction for the original instrument.
-        self.transaction_portfolios_api.upsert_transactions(
+        await self.transaction_portfolios_api.upsert_transactions(
             scope=TestDataUtilities.tutorials_scope,
             code=portfolio_code,
             transaction_request=[
@@ -104,12 +105,12 @@ class CorporateActions(asynctest.TestCase):
             description="Name change corporate actions source",
         )
 
-        self.corporate_actions_sources_api.create_corporate_action_source(
+        await self.corporate_actions_sources_api.create_corporate_action_source(
             create_corporate_action_source_request=corporate_action_source
         )
 
         # Apply the corporate actions source to the transaction portfolio.
-        self.transaction_portfolios_api.upsert_portfolio_details(
+        await self.transaction_portfolios_api.upsert_portfolio_details(
             scope=TestDataUtilities.tutorials_scope,
             code=portfolio_code,
             effective_at=effective_at_date,
@@ -171,14 +172,14 @@ class CorporateActions(asynctest.TestCase):
         )
 
         # Make the request through the CorporateActionSourcesApi.
-        upsert_corp_act_response = self.corporate_actions_sources_api.batch_upsert_corporate_actions(
+        upsert_corp_act_response = await self.corporate_actions_sources_api.batch_upsert_corporate_actions(
             scope=TestDataUtilities.tutorials_scope,
             code=corporate_action_source_code,
             upsert_corporate_action_request=[corporate_action_request],
         )
 
         # Fetch holdings in portfolio once corporate action is applied.
-        holdings = self.transaction_portfolios_api.get_holdings(
+        holdings = await self.transaction_portfolios_api.get_holdings(
             scope=TestDataUtilities.tutorials_scope,
             code=portfolio_code,
             property_keys=["Instrument/default/Figi"],
@@ -194,17 +195,17 @@ class CorporateActions(asynctest.TestCase):
 
         # Remove all data that was created for the test.
         # Delete the two instruments.
-        self.instruments_api.delete_instrument("Figi", instrument_original_figi)
+        await self.instruments_api.delete_instrument("Figi", instrument_original_figi)
 
-        self.instruments_api.delete_instrument("Figi", instrument_updated_figi)
+        await self.instruments_api.delete_instrument("Figi", instrument_updated_figi)
 
         # Delete the portfolio.
-        self.portfolios_api.delete_portfolio(
+        await self.portfolios_api.delete_portfolio(
             TestDataUtilities.tutorials_scope, portfolio_code
         )
 
         # Delete the corporate action source.
-        self.corporate_actions_sources_api.delete_corporate_action_source(
+        await self.corporate_actions_sources_api.delete_corporate_action_source(
             TestDataUtilities.tutorials_scope, corporate_action_source_code
         )
 
@@ -216,8 +217,8 @@ class CorporateActions(asynctest.TestCase):
             code=f"test-corp-action-code-{_uuid}",
             display_name=f"test-corp-action-{_uuid}",
         )
-        self.corporate_actions_sources_api.create_corporate_action_source(request)
-        sources = self.corporate_actions_sources_api.list_corporate_action_sources()
+        await self.corporate_actions_sources_api.create_corporate_action_source(request)
+        sources = await self.corporate_actions_sources_api.list_corporate_action_sources()
         self.assertGreater(len(sources.values), 0)
 
     @unittest.skip("Not Implemented")
@@ -228,8 +229,8 @@ class CorporateActions(asynctest.TestCase):
             code=f"test-corp-action-code-{_uuid}",
             display_name=f"test-corp-action-{_uuid}",
         )
-        self.corporate_actions_sources_api.create_corporate_action_source(request)
-        sources = self.corporate_actions_sources_api.get_corporate_actions(
+        await self.corporate_actions_sources_api.create_corporate_action_source(request)
+        sources = await self.corporate_actions_sources_api.get_corporate_actions(
             scope=f"test-corp-action-code-{_uuid}",
             code=f"test-corp-action-code-{_uuid}",
         )

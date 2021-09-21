@@ -13,24 +13,24 @@ from tests.utilities import TestDataUtilities
 
 
 class Transactions(asynctest.TestCase):
+    use_default_loop = True
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
+        self.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
 
-        instrument_loader = InstrumentLoader(cls.instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
+        instrument_loader = InstrumentLoader(self.instruments_api)
+        self.instrument_ids = await instrument_loader.load_instruments()
 
-        cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
+        self.test_data_utilities = TestDataUtilities(self.transaction_portfolios_api)
 
     @lusid_feature("F17")
     async def test_load_listed_instrument_transaction(self):
         # create the portfolio
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         trade_date = datetime(2018, 1, 1, tzinfo=pytz.utc)
 
@@ -52,12 +52,12 @@ class Transactions(asynctest.TestCase):
         )
 
         # add the transaction
-        self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_request=[transaction])
 
         # get the transaction
-        transactions = self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
+        transactions = await self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
                                                                         code=portfolio_code)
 
         self.assertEqual(len(transactions.values), 1)
@@ -66,7 +66,7 @@ class Transactions(asynctest.TestCase):
     @lusid_feature("F18")
     async def test_load_cash_transaction(self):
         # create the portfolio
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         trade_date = datetime(2018, 1, 1, tzinfo=pytz.utc)
 
@@ -92,12 +92,12 @@ class Transactions(asynctest.TestCase):
         )
 
         # add the transaction
-        self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_request=[transaction])
 
         # get the transaction
-        transactions = self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
+        transactions = await self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
                                                                         code=portfolio_code)
 
         self.assertEqual(len(transactions.values), 1)
@@ -110,7 +110,7 @@ class Transactions(asynctest.TestCase):
         effective_date = datetime(2018, 1, 1, tzinfo=pytz.utc)
 
         # create portfolio code
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         # Upsert transactions
         transactions = [
@@ -134,13 +134,13 @@ class Transactions(asynctest.TestCase):
                                                                transaction_type="StockIn")
         ]
 
-        self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.upsert_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_request=transactions)
 
         # get transactions
         transaction_ids = []
-        existing_transactions = self.transaction_portfolios_api.get_transactions(
+        existing_transactions = await self.transaction_portfolios_api.get_transactions(
             scope=TestDataUtilities.tutorials_scope,
             code=portfolio_code)
 
@@ -148,11 +148,11 @@ class Transactions(asynctest.TestCase):
             transaction_ids.append(existing_transactions.values[i].transaction_id)
 
         # cancel transactions
-        self.transaction_portfolios_api.cancel_transactions(scope=TestDataUtilities.tutorials_scope,
+        await self.transaction_portfolios_api.cancel_transactions(scope=TestDataUtilities.tutorials_scope,
                                                             code=portfolio_code,
                                                             transaction_ids=transaction_ids)
 
         # verify portfolio is now empty
-        new_transactions = self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
+        new_transactions = await self.transaction_portfolios_api.get_transactions(scope=TestDataUtilities.tutorials_scope,
                                                                             code=portfolio_code)
         self.assertEqual(len(new_transactions.values), 0)

@@ -12,13 +12,13 @@ from tests.utilities import TestDataUtilities
 
 class Quotes(asynctest.TestCase):
     quotes_api = None
+    use_default_loop = True
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.quotes_api = lusid.QuotesApi(api_client)
+        self.quotes_api = lusid.QuotesApi(api_client)
 
     @lusid_feature("F28")
     async def test_add_quote(self):
@@ -40,7 +40,7 @@ class Quotes(asynctest.TestCase):
             )
         )
 
-        self.quotes_api.upsert_quotes(TestDataUtilities.tutorials_scope, request_body={"quote1": request})
+        await self.quotes_api.upsert_quotes(TestDataUtilities.tutorials_scope, request_body={"quote1": request})
 
     @lusid_feature("F29")
     async def test_get_quote_for_instrument_for_single_day(self):
@@ -56,7 +56,7 @@ class Quotes(asynctest.TestCase):
         effective_date = datetime(2019, 4, 15, tzinfo=pytz.utc)
 
         # get the close quote for AAPL on 15-Apr-19
-        quote_response = self.quotes_api.get_quotes(
+        quote_response = await self.quotes_api.get_quotes(
             scope=TestDataUtilities.tutorials_scope,
             effective_at=effective_date,
             request_body={"quote1": quote_series_id}
@@ -84,7 +84,7 @@ class Quotes(asynctest.TestCase):
 
         # get the quotes for each day in the date range
         quote_responses = [
-            self.quotes_api.get_quotes(
+            await self.quotes_api.get_quotes(
                 scope=TestDataUtilities.market_data_scope,
                 effective_at=d,
                 request_body={"quote1": quote_id}

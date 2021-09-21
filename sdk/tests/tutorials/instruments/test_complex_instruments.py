@@ -9,14 +9,15 @@ from tests.utilities import TestDataUtilities
 
 
 class ComplexInstrumentTests(asynctest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    use_default_loop = True
+
+    def setUp(self):
         api_client = TestDataUtilities.api_client()
-        cls.instruments_api = lusid.InstrumentsApi(api_client)
+        self.instruments_api = lusid.InstrumentsApi(api_client)
 
     # Define a function to upsert instrument
-    def upsert_otc_to_lusid(self, instrument, name, lusid_id):
-        response = self.instruments_api.upsert_instruments(
+    async def upsert_otc_to_lusid(self, instrument, name, lusid_id):
+        response = await self.instruments_api.upsert_instruments(
             request_body={
                 lusid_id: models.InstrumentDefinition(
                     name=name,
@@ -30,8 +31,8 @@ class ComplexInstrumentTests(asynctest.TestCase):
         # Check for failures with response
         self.assertEqual(len(response.values), 1, response.failed)
 
-    def query_otc_from_lusid(self, lusid_id):
-        return self.instruments_api.get_instruments(
+    async def query_otc_from_lusid(self, lusid_id):
+        return await self.instruments_api.get_instruments(
             identifier_type="ClientInternal", request_body=[lusid_id]
         )
 
@@ -52,10 +53,10 @@ class ComplexInstrumentTests(asynctest.TestCase):
 
         # Upsert to LUSID with unique ID and
         unique_id = "id-fxfwd-2"
-        self.upsert_otc_to_lusid(fx_forward, "some-name-for-this-fxforward", unique_id)
+        await self.upsert_otc_to_lusid(fx_forward, "some-name-for-this-fxforward", unique_id)
 
         # Can now query from LUSID and run tests
-        response = self.query_otc_from_lusid(unique_id)
+        response = await self.query_otc_from_lusid(unique_id)
         self.assertIsNotNone(response)
         self.assertGreater(len(response.values), 0, "Response.values = 0")
         saved_fx_forward = response.values[unique_id].instrument_definition
@@ -86,10 +87,10 @@ class ComplexInstrumentTests(asynctest.TestCase):
 
         # Upsert to LUSID with unique ID and
         unique_id = "id-fxopt-1"
-        self.upsert_otc_to_lusid(fx_option, "some-name-for-this-fxoption", unique_id)
+        await self.upsert_otc_to_lusid(fx_option, "some-name-for-this-fxoption", unique_id)
 
         # Can now query from LUSID and run tests
-        response = self.query_otc_from_lusid(unique_id)
+        response = await self.query_otc_from_lusid(unique_id)
         self.assertIsNotNone(response)
         self.assertGreater(len(response.values), 0, "Response.values = 0")
         saved_fx_option = response.values[unique_id].instrument_definition
@@ -133,7 +134,7 @@ class ComplexInstrumentTests(asynctest.TestCase):
 
         request_id = "upsert_request_001"
         term_deposit_identifier = "TermDepositInstrument"
-        upsert_term_deposit = self.instruments_api.upsert_instruments(request_body={
+        upsert_term_deposit = await self.instruments_api.upsert_instruments(request_body={
         request_id: models.InstrumentDefinition(
             name="Term Deposit Example",
             identifiers={"ClientInternal": models.InstrumentIdValue(term_deposit_identifier)},
@@ -173,7 +174,7 @@ class ComplexInstrumentTests(asynctest.TestCase):
 
         request_id = "upsert_request_001"
         zero_coupon_bond_identifier = "ZeroCouponBondInstrument"
-        upsert_zero_coupon_bond = self.instruments_api.upsert_instruments(request_body={
+        upsert_zero_coupon_bond = await self.instruments_api.upsert_instruments(request_body={
             request_id: models.InstrumentDefinition(
                 name="Zero Coupon Bond Example",
                 identifiers={"ClientInternal": models.InstrumentIdValue(zero_coupon_bond_identifier)},

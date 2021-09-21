@@ -12,6 +12,7 @@ from tests.utilities import TestDataUtilities
 
 
 class Portfolios(asynctest.TestCase):
+    use_default_loop = True
 
     async def setUp(self):
         # create a configured API client

@@ -13,24 +13,23 @@ from tests.utilities import TestDataUtilities
 
 class Reconciliation(asynctest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    async def setUp(self):
         # create a configured API client
         api_client = TestDataUtilities.api_client()
 
-        cls.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
-        cls.reconciliations_api = lusid.ReconciliationsApi(api_client)
+        self.transaction_portfolios_api = lusid.TransactionPortfoliosApi(api_client)
+        self.reconciliations_api = lusid.ReconciliationsApi(api_client)
 
         instruments_api = lusid.InstrumentsApi(api_client)
         instrument_loader = InstrumentLoader(instruments_api)
-        cls.instrument_ids = instrument_loader.load_instruments()
+        self.instrument_ids = await instrument_loader.load_instruments()
 
-        cls.test_data_utilities = TestDataUtilities(cls.transaction_portfolios_api)
+        self.test_data_utilities = TestDataUtilities(self.transaction_portfolios_api)
 
     @lusid_feature("F16")
     async def test_reconcile_portfolio(self):
         # create the portfolio
-        portfolio_code = self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
+        portfolio_code = await self.test_data_utilities.create_transaction_portfolio(TestDataUtilities.tutorials_scope)
 
         today = datetime.now().astimezone(tz=pytz.utc)
         yesterday = today - timedelta(1)
@@ -127,7 +126,7 @@ class Reconciliation(asynctest.TestCase):
         ]
 
         # add the transactions to LUSID
-        transactions_response = self.transaction_portfolios_api.upsert_transactions(
+        transactions_response = await self.transaction_portfolios_api.upsert_transactions(
             scope=TestDataUtilities.tutorials_scope,
             code=portfolio_code,
             transaction_request=todays_transactions)
@@ -151,7 +150,7 @@ class Reconciliation(asynctest.TestCase):
             instrument_property_keys=[TestDataUtilities.lusid_luid_identifier]
         )
 
-        breaks = self.reconciliations_api.reconcile_holdings(portfolios_reconciliation_request=reconciliation_request)
+        breaks = await self.reconciliations_api.reconcile_holdings(portfolios_reconciliation_request=reconciliation_request)
 
         for rec_break in breaks.values:
             print("{}\t{}\t{}".format(rec_break.instrument_uid, rec_break.difference_units,
