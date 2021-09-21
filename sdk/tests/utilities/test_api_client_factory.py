@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 from collections import UserString
 from datetime import datetime
@@ -9,7 +10,7 @@ from urllib3 import PoolManager, ProxyManager
 from parameterized import parameterized
 from threading import Thread
 from lusid_asyncio import (InstrumentsApi, ResourceListOfInstrumentIdTypeDescriptor,
-                   TCPKeepAlivePoolManager, TCPKeepAliveProxyManager)
+                           TCPKeepAlivePoolManager, TCPKeepAliveProxyManager)
 from lusid_asyncio.utilities import ApiClientFactory
 
 from tests.utilities import TokenUtilities as tu, CredentialsSource
@@ -266,7 +267,7 @@ class ApiFactory(asynctest.TestCase):
         )
 
         api = api_factory.build(InstrumentsApi)
-        self.validate_api(api)
+        await self.validate_api(api)
 
         self.assertGreater(len(responses), 0)
 
@@ -283,9 +284,9 @@ class ApiFactory(asynctest.TestCase):
         async def get_identifier_types(factory):
             return await factory.build(InstrumentsApi).get_instrument_identifier_types()
 
-        thread1 = Thread(target=get_identifier_types, args=[api_factory])
-        thread2 = Thread(target=get_identifier_types, args=[api_factory])
-        thread3 = Thread(target=get_identifier_types, args=[api_factory])
+        calls = [
+            get_identifier_types(api_factory)
+        ]
 
         with patch("requests.post") as identity_mock:
             identity_mock.side_effect = lambda *args, **kwargs: MockApiResponse(
@@ -297,13 +298,7 @@ class ApiFactory(asynctest.TestCase):
                 status_code=200
             )
 
-            thread1.start()
-            thread2.start()
-            thread3.start()
-
-            thread1.join()
-            thread2.join()
-            thread3.join()
+            await asyncio.gather(*calls)
 
             # Ensure that we only got an access token once
             self.assertEqual(1, identity_mock.call_count)

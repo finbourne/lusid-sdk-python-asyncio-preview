@@ -106,7 +106,7 @@ class ApiClientFactory:
                     return result[0]
 
                 else:
-                    return attr(*args, **kwargs)
+                    return await attr(*args, **kwargs)
 
             return wrapper if inspect.ismethod(attr) else attr
 
