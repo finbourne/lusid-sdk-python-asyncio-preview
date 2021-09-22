@@ -78,13 +78,17 @@ class ApiClientBuilderTests(unittest.TestCase):
         })
 
         # Use a temporary file and no environment variables to generate the API Client
-        with patch.dict('os.environ', env_vars, clear=True), patch("requests.post") as mock_requests:
+        with patch.dict('os.environ', env_vars, clear=True), \
+                patch("requests.post") as mock_requests, \
+                patch("ssl.create_default_context") as mock_ssl_context:
             mock_requests.return_value.status_code = 200
             mock_requests.return_value.json.return_value = {
                 "access_token": "mock_access_token",
                 "refresh_token": "mock_refresh_token",
                 "expires_in": 60
             }
+
+            mock_ssl_context.return_value = False
 
             secrets_file = TempFileManager.create_temp_file(secrets)
             client = ApiClientBuilder.build(
