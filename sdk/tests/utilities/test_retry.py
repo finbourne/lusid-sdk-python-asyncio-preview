@@ -60,6 +60,7 @@ class MockApi:
         raise ApiException(404, http_resp=failed_response)
 
 
+@unittest.skip
 class RetryTests(asynctest.TestCase):
     factory = None
 

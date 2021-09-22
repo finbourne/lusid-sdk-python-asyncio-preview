@@ -79,7 +79,7 @@ class ApiClientFactory:
             attr = super(metaclass, source_obj).__getattribute__(name)
 
             @functools.wraps(attr)
-            @lusidretry
+            # @lusidretry
             async def wrapper(*args, **kwargs):
                 def is_http_info_method(m):
                     return inspect.ismethod(m) and m.__name__.endswith(
