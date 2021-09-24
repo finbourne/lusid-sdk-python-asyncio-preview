@@ -39,7 +39,7 @@ class ReferencePortfolio(asynctest.TestCase):
     @lusid_feature("F39")
     async def test_create_reference_portfolio(self):
 
-        f39_reference_portfolio_code = "F39p_ReferencePortfolioCode-asyncio"
+        f39_reference_portfolio_code = "F39p_ReferencePortfolioCode"
         f39_reference_portfolio_name = "F39p_Reference Portfolio Name"
 
         # Details of the new reference portfolio to be created
@@ -67,7 +67,7 @@ class ReferencePortfolio(asynctest.TestCase):
         constituent_weights = [10, 20, 30, 15, 25]
         effective_date = datetime(year=2021, month=3, day=29, tzinfo=pytz.UTC)
 
-        f40_reference_portfolio_code = "F40p_ReferencePortfolioCode-asyncio"
+        f40_reference_portfolio_code = "F40p_ReferencePortfolioCode"
         f40_reference_portfolio_name = "F40p_Reference Portfolio Name"
 
 
