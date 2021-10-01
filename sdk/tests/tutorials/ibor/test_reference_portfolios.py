@@ -39,7 +39,7 @@ class ReferencePortfolio(asynctest.TestCase):
     @lusid_feature("F39")
     async def test_create_reference_portfolio(self):
 
-        f39_reference_portfolio_code = "F39p_ReferencePortfolioCode"
+        f39_reference_portfolio_code = "F39p_ReferencePortfolioCode_asyncio"
         f39_reference_portfolio_name = "F39p_Reference Portfolio Name"
 
         # Details of the new reference portfolio to be created
