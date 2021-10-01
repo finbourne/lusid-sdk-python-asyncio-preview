@@ -195,9 +195,9 @@ class CorporateActions(asynctest.TestCase):
 
         # Remove all data that was created for the test.
         # Delete the two instruments.
-        await self.instruments_api.delete_instrument("Figi", instrument_original_figi)
-
-        await self.instruments_api.delete_instrument("Figi", instrument_updated_figi)
+        # await self.instruments_api.delete_instrument("Figi", instrument_original_figi)
+        #
+        # await self.instruments_api.delete_instrument("Figi", instrument_updated_figi)
 
         # Delete the portfolio.
         await self.portfolios_api.delete_portfolio(
