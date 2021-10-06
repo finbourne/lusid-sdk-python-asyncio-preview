@@ -1,16 +1,16 @@
 # lusid_asyncio.EntitiesApi
 
-All URIs are relative to *http://local-unit-test-server.lusid.com:37599*
+All URIs are relative to *http://local-unit-test-server.lusid.com:55238*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_portfolio_changes**](EntitiesApi.md#get_portfolio_changes) | **GET** /api/entities/changes/portfolios | [EARLY ACCESS] Get the next change to each portfolio in a scope.
+[**get_portfolio_changes**](EntitiesApi.md#get_portfolio_changes) | **GET** /api/entities/changes/portfolios | [EARLY ACCESS] GetPortfolioChanges: Get the next change to each portfolio in a scope.
 
 
 # **get_portfolio_changes**
 > ResourceListOfChange get_portfolio_changes(scope, effective_at, as_at=as_at)
 
-[EARLY ACCESS] Get the next change to each portfolio in a scope.
+[EARLY ACCESS] GetPortfolioChanges: Get the next change to each portfolio in a scope.
 
 Gets the time of the next (earliest effective at) modification (correction and/or amendment) to each portfolio in a scope relative to a point in bitemporal time.  Includes changes from parent portfolios in different scopes.  Excludes changes from subcriptions (e.g corporate actions).
 
@@ -23,10 +23,10 @@ import time
 import lusid_asyncio
 from lusid_asyncio.rest import ApiException
 from pprint import pprint
-# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:37599
+# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:55238
 # See configuration.py for a list of all supported configuration parameters.
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:37599"
+    host = "http://local-unit-test-server.lusid.com:55238"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -36,7 +36,7 @@ configuration = lusid_asyncio.Configuration(
 
 # Configure OAuth2 access token for authorization: oauth2
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:37599"
+    host = "http://local-unit-test-server.lusid.com:55238"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 
@@ -49,7 +49,7 @@ effective_at = 'effective_at_example' # str | The effective date of the origin.
 as_at = '2013-10-20T19:20:30+01:00' # datetime | The as-at date of the origin. (optional)
 
     try:
-        # [EARLY ACCESS] Get the next change to each portfolio in a scope.
+        # [EARLY ACCESS] GetPortfolioChanges: Get the next change to each portfolio in a scope.
         api_response = api_instance.get_portfolio_changes(scope, effective_at, as_at=as_at)
         pprint(api_response)
     except ApiException as e:
