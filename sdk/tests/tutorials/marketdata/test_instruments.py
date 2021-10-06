@@ -46,42 +46,42 @@ class Instruments(asynctest.TestCase):
     async def test_seed_instrument_master(self):
         response = await self.instruments_api.upsert_instruments(request_body={
 
-            "BBG000S4TBX8": models.InstrumentDefinition(
-                name="Glaxo SmithKline",
+            "BBG000FD8G46": models.InstrumentDefinition(
+                name="HISCOX LTD",
                 identifiers={
-                    "Figi": models.InstrumentIdValue(value="BBG000S4TBX8"),
+                    "Figi": models.InstrumentIdValue(value="BBG000FD8G46"),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_1")
                 }
             ),
 
-            "BBG00JHMQ2C5": models.InstrumentDefinition(
-                name="BAE SYSTEMS DASF",
+            "BBG000DW76R4": models.InstrumentDefinition(
+                name="ITV PLC",
                 identifiers={
-                    "Figi": models.InstrumentIdValue(value="BBG00JHMQ2C5"),
+                    "Figi": models.InstrumentIdValue(value="BBG000DW76R4"),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_2")
                 }
             ),
 
-            "BBG009LGFCP1": models.InstrumentDefinition(
-                name="BARCLAYS PLC",
+            "BBG000PQKVN8": models.InstrumentDefinition(
+                name="MONDI PLC",
                 identifiers={
-                    "Figi": models.InstrumentIdValue(value="BBG009LGFCP1"),
+                    "Figi": models.InstrumentIdValue(value="BBG000PQKVN8"),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_3")
                 }
             ),
 
-            "BBG0018VF913": models.InstrumentDefinition(
-                name="Rentokil Initial",
+            "BBG000BDWPY0": models.InstrumentDefinition(
+                name="NEXT PLC",
                 identifiers={
-                    "Figi": models.InstrumentIdValue(value="BBG0018VF913"),
+                    "Figi": models.InstrumentIdValue(value="BBG000BDWPY0"),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_4")
                 }
             ),
 
-            "BBG000H3BY98": models.InstrumentDefinition(
-                name="SSE PLC",
+            "BBG000BF46Y8": models.InstrumentDefinition(
+                name="TESCO PLC",
                 identifiers={
-                    "Figi": models.InstrumentIdValue(value="BBG000H3BY98"),
+                    "Figi": models.InstrumentIdValue(value="BBG000BF46Y8"),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_5")
                 }
             )
@@ -92,12 +92,12 @@ class Instruments(asynctest.TestCase):
     @lusid_feature("F22")
     async def test_lookup_instrument_by_unique_id(self):
 
-        figi = "BBG000S4TBX8"
+        figi = "BBG000FD8G46"
 
         # set up the instrument
         response = await self.instruments_api.upsert_instruments(request_body={
             figi: models.InstrumentDefinition(
-                name="Glaxo SmithKline",
+                name="HISCOX LTD",
                 identifiers={
                     "Figi": models.InstrumentIdValue(value=figi),
                     "ClientInternal": models.InstrumentIdValue(value="internal_id_1")
@@ -117,7 +117,7 @@ class Instruments(asynctest.TestCase):
         self.assertTrue(figi in looked_up_instruments.values, msg=f"cannot find {figi}")
 
         instrument = looked_up_instruments.values[figi]
-        self.assertTrue(instrument.name, "Glaxo SmithKline")
+        self.assertTrue(instrument.name, "HISCOX LTD")
 
         property = next(filter(lambda i: i.key == "Instrument/default/ClientInternal", instrument.properties), None)
         self.assertTrue(property.value, "internal_id_1")
@@ -141,7 +141,7 @@ class Instruments(asynctest.TestCase):
     @lusid_feature("F25")
     async def test_list_instruments_by_identifier_type(self):
 
-        figis = ["BBG000S4TBX8", "BBG00JHMQ2C5", "BBG009LGFCP1"]
+        figis = ["BBG000FD8G46", "BBG000DW76R4", "BBG000PQKVN8"]
 
         # get a set of instruments querying by FIGIs
         instruments = await self.instruments_api.get_instruments(identifier_type="Figi", request_body=figis)
@@ -155,7 +155,7 @@ class Instruments(asynctest.TestCase):
         property_value = models.PropertyValue(label_value="Insurance")
         property_key = f"Instrument/{TestDataUtilities.tutorials_scope}/CustomSector"
         identifier_type = "Figi"
-        identifier = "BBG000S4TBX8"
+        identifier = "BBG000FD8G46"
 
         # update the instrument
         await self.instruments_api.upsert_instruments_properties(upsert_instrument_property_request=[
