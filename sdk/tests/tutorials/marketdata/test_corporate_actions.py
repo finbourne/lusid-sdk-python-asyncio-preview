@@ -214,9 +214,13 @@ class CorporateActions(asynctest.TestCase):
         )
 
         # Delete the corporate action source.
-        await self.corporate_actions_sources_api.delete_corporate_action_source(
-            TestDataUtilities.tutorials_scope, corporate_action_source_code
-        )
+        try:
+            await self.corporate_actions_sources_api.delete_corporate_action_source(
+                TestDataUtilities.tutorials_scope, corporate_action_source_code
+            )
+        except lusid.ApiException as e:
+            if json.loads(e.body)["name"] == "CorporateActionSourceDoesNotExist":
+                pass  # ignore if the property definition exists
 
     @lusid_feature("F33")
     async def test_list_corporate_action_sources(self):
