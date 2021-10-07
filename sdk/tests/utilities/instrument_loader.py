@@ -30,7 +30,7 @@ class InstrumentLoader:
 
         response = await self.instruments_api.upsert_instruments(request_body=instruments_to_create)
 
-        assert (len(response.failed) == 0)
+        assert (len(response.failed) == 0), response.failed
 
         return sorted([i.lusid_instrument_id for i in response.values.values()])
 
