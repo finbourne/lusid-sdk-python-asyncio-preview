@@ -1,3 +1,4 @@
+import json
 import unittest
 import uuid
 
@@ -105,9 +106,13 @@ class CorporateActions(asynctest.TestCase):
             description="Name change corporate actions source",
         )
 
-        await self.corporate_actions_sources_api.create_corporate_action_source(
-            create_corporate_action_source_request=corporate_action_source
-        )
+        try:
+            await self.corporate_actions_sources_api.create_corporate_action_source(
+                create_corporate_action_source_request=corporate_action_source
+            )
+        except lusid.ApiException as e:
+            if json.loads(e.body)["name"] == "EntityWithIdAlreadyExists":
+                pass  # ignore if the property definition exists
 
         # Apply the corporate actions source to the transaction portfolio.
         await self.transaction_portfolios_api.upsert_portfolio_details(
