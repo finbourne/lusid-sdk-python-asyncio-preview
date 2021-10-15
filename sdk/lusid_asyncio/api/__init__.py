@@ -9,6 +9,7 @@ from lusid_asyncio.api.application_metadata_api import ApplicationMetadataApi
 from lusid_asyncio.api.blocks_api import BlocksApi
 from lusid_asyncio.api.calendars_api import CalendarsApi
 from lusid_asyncio.api.complex_market_data_api import ComplexMarketDataApi
+from lusid_asyncio.api.compliance_api import ComplianceApi
 from lusid_asyncio.api.configuration_recipe_api import ConfigurationRecipeApi
 from lusid_asyncio.api.conventions_api import ConventionsApi
 from lusid_asyncio.api.corporate_action_sources_api import CorporateActionSourcesApi
