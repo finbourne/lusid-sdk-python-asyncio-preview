@@ -46,7 +46,6 @@ from lusid_asyncio.api.schemas_api import SchemasApi
 from lusid_asyncio.api.scopes_api import ScopesApi
 from lusid_asyncio.api.search_api import SearchApi
 from lusid_asyncio.api.sequences_api import SequencesApi
-from lusid_asyncio.api.structured_market_data_api import StructuredMarketDataApi
 from lusid_asyncio.api.structured_result_data_api import StructuredResultDataApi
 from lusid_asyncio.api.system_configuration_api import SystemConfigurationApi
 from lusid_asyncio.api.transaction_portfolios_api import TransactionPortfoliosApi
