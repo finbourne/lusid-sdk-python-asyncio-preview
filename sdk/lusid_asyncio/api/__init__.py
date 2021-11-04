@@ -24,7 +24,6 @@ from lusid_asyncio.api.executions_api import ExecutionsApi
 from lusid_asyncio.api.fees_and_commissions_api import FeesAndCommissionsApi
 from lusid_asyncio.api.instruments_api import InstrumentsApi
 from lusid_asyncio.api.legal_entities_api import LegalEntitiesApi
-from lusid_asyncio.api.login_api import LoginApi
 from lusid_asyncio.api.order_graph_api import OrderGraphApi
 from lusid_asyncio.api.order_instructions_api import OrderInstructionsApi
 from lusid_asyncio.api.orders_api import OrdersApi
