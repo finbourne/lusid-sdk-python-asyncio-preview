@@ -1,6 +1,6 @@
 # lusid_asyncio.OrderGraphApi
 
-All URIs are relative to *http://local-unit-test-server.lusid.com:50898*
+All URIs are relative to *http://local-unit-test-server.lusid.com:53421*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -24,10 +24,10 @@ import time
 import lusid_asyncio
 from lusid_asyncio.rest import ApiException
 from pprint import pprint
-# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:50898
+# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:53421
 # See configuration.py for a list of all supported configuration parameters.
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:50898"
+    host = "http://local-unit-test-server.lusid.com:53421"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -37,7 +37,7 @@ configuration = lusid_asyncio.Configuration(
 
 # Configure OAuth2 access token for authorization: oauth2
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:50898"
+    host = "http://local-unit-test-server.lusid.com:53421"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 
@@ -109,10 +109,10 @@ import time
 import lusid_asyncio
 from lusid_asyncio.rest import ApiException
 from pprint import pprint
-# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:50898
+# Defining the host is optional and defaults to http://local-unit-test-server.lusid.com:53421
 # See configuration.py for a list of all supported configuration parameters.
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:50898"
+    host = "http://local-unit-test-server.lusid.com:53421"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -122,7 +122,7 @@ configuration = lusid_asyncio.Configuration(
 
 # Configure OAuth2 access token for authorization: oauth2
 configuration = lusid_asyncio.Configuration(
-    host = "http://local-unit-test-server.lusid.com:50898"
+    host = "http://local-unit-test-server.lusid.com:53421"
 )
 configuration.access_token = 'YOUR_ACCESS_TOKEN'
 
