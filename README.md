@@ -3,6 +3,7 @@ This is the Python Asyncio Preview SDK for [LUSID by FINBOURNE](https://www.finb
 
 <a href="https://www.lusid.com/app/signup"><img src="https://content.finbourne.com/LUSID_repo.png" alt="LUSID_by_Finbourne"></a>
 
+
 ## Installation
 
 The PyPi package for the LUSID SDK can installed using the following:
